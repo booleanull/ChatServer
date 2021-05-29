@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import controllers.auth.AuthController
 import controllers.chat.ChatController
 import controllers.profile.ProfileController
+import controllers.settings.SettingsController
 import databases.chat.ChatDao
 import databases.user.UserDao
 import org.hibernate.cfg.Configuration
@@ -19,7 +20,7 @@ import repositories.user.UserRepositoryImpl
 val appModule = module {
 
     single {
-        Server(listOf(get<AuthController>(), get<ChatController>(), get<ProfileController>()))
+        Server(listOf(get<AuthController>(), get<ChatController>(), get<ProfileController>(), get<SettingsController>()))
     }
 
     single {
