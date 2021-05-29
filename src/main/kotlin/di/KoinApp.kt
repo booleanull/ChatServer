@@ -3,6 +3,7 @@ package di
 import Server
 import com.google.gson.GsonBuilder
 import controllers.auth.AuthController
+import controllers.chat.ChatController
 import databases.user.UserDao
 import org.hibernate.cfg.Configuration
 import org.koin.dsl.module
@@ -14,7 +15,7 @@ import repositories.user.UserRepositoryImpl
 val appModule = module {
 
     single {
-        Server(listOf(get<AuthController>()))
+        Server(listOf(get<ChatController>(), get<AuthController>()))
     }
 
     single {
@@ -22,6 +23,7 @@ val appModule = module {
     }
 
     single { AuthController(get(), get(), get()) }
+    single { ChatController(get(), get()) }
 
     single<UserRepository> {
         UserRepositoryImpl(get())

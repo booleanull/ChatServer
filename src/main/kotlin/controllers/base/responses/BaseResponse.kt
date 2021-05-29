@@ -15,4 +15,6 @@ open class BaseResponse(
 ) {
 
     fun halt(gson: Gson): HaltException = Spark.halt(httpStatus, gson.toJson(this))
+
+    fun halt(transformer: (model: Any) -> String): HaltException = Spark.halt(httpStatus, transformer.invoke(this))
 }

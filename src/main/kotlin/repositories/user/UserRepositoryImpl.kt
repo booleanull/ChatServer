@@ -4,7 +4,7 @@ import controllers.auth.models.AuthData
 import databases.toHibUser
 import databases.toUser
 import databases.user.UserDao
-import repositories.user.model.User
+import repositories.user.models.User
 
 class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 

@@ -1,7 +1,7 @@
 package repositories.user
 
 import controllers.auth.models.AuthData
-import repositories.user.model.User
+import repositories.user.models.User
 
 interface UserRepository {
 

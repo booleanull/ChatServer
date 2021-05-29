@@ -1,7 +1,7 @@
 package databases
 
 import databases.user.models.HibUser
-import repositories.user.model.User
+import repositories.user.models.User
 
 fun User.toHibUser() = HibUser().also { hib ->
     hib.id = id

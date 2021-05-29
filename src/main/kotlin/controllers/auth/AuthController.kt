@@ -10,12 +10,11 @@ import controllers.auth.responses.ok.RegistrationOkResponse
 import controllers.base.BaseController
 import controllers.base.post
 import controllers.base.responses.error.BadRequestErrorResponse
-import controllers.base.responses.ok.BaseOkResponse
 import org.apache.commons.codec.binary.Hex
 import org.apache.commons.codec.digest.DigestUtils
 import repositories.token.TokenManager
 import repositories.user.UserRepository
-import repositories.user.model.User
+import repositories.user.models.User
 
 class AuthController(
     private val gson: Gson,
