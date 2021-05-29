@@ -15,6 +15,7 @@ class HibUser: Serializable, HibEntity {
     var token: String = ""
     var login: String = ""
     var name: String = ""
+    @Column(columnDefinition = "text")
     var photo: String = ""
     var password: String = ""
     @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
