@@ -18,7 +18,7 @@ import repositories.user.UserRepositoryImpl
 val appModule = module {
 
     single {
-        Server(listOf(get<ChatController>(), get<AuthController>()))
+        Server(listOf(get<AuthController>(), get<ChatController>()))
     }
 
     single {
@@ -31,8 +31,4 @@ val appModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<TokenManager> { TokenManagerImpl(get()) }
     single<ChatRepository> { ChatRepositoryImpl(get()) }
-
-    single { Configuration().configure().buildSessionFactory() }
-    single { UserDao(get()) }
-    single { ChatDao(get()) }
 }

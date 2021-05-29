@@ -9,6 +9,7 @@ import controllers.base.responses.ok.BaseOkResponse
 import controllers.chat.models.ChatData
 import controllers.chat.models.SendData
 import controllers.chat.response.error.ChatNotFoundErrorResponse
+import controllers.chat.response.error.ChatStartErrorResponse
 import controllers.chat.response.ok.*
 import repositories.chat.ChatRepository
 import repositories.chat.models.Chat
@@ -30,6 +31,7 @@ class ChatController(
         initStartChat()
         initChats()
         initChat()
+        initSend()
     }
 
     private fun initStartChat() {
@@ -40,7 +42,8 @@ class ChatController(
             }
 
             val chat = chatRepository.getChat(data.chatName)
-            val user = userRepository.getUserByToken(req.headers("token"))!!
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
 
             userRepository.saveUser(
                 User(
@@ -52,12 +55,21 @@ class ChatController(
                     user.password,
                     mutableListOf<Chat>().apply {
                         addAll(user.chats)
-                        add(chat ?: Chat(0, data.chatName, listOf()))
+                        if (!user.chats.contains(chat)) {
+                            add(chat ?: Chat(0, data.chatName, listOf()))
+                        }
                     }
                 )
             )
 
-            BaseOkResponse()
+            val updateChat = chatRepository.getChat(data.chatName)!!
+            val updateUser = userRepository.getUserByToken(token)!!
+
+            if (updateUser.chats.contains(updateChat)) {
+                getChatResponse(updateChat)
+            } else {
+                throw ChatStartErrorResponse.halt(gson)
+            }
         }, gson::toJson, tokenManager)
     }
 
@@ -70,33 +82,26 @@ class ChatController(
     }
 
     private fun initChat() {
-        get("/chat", { req, res ->
+        post("/chat", { req, res ->
             val data = gson.fromJson(req.body(), ChatData::class.java)
             if (data.chatName == null) {
                 throw BadRequestErrorResponse.halt(gson)
             }
 
             val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
-            ChatOkResponse(
-                ChatResponse(
-                    chat.id,
-                    chat.name,
-                    chat.messages.map { message ->
-                        val user = userRepository.getUserById(message.authorId)!!
-                        MessageResponse(
-                            message.id,
-                            UserResponse(user.id, user.login, user.name, user.photo),
-                            message.text,
-                            message.time
-                        )
-                    }
-                )
-            )
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            if (user.chats.contains(chat)) {
+                getChatResponse(chat)
+            } else {
+                throw ChatStartErrorResponse.halt(gson)
+            }
         }, gson::toJson, tokenManager)
     }
 
     private fun initSend() {
-        post("/send", { req, res ->
+        post("/chat/send", { req, res ->
             val data = gson.fromJson(req.body(), SendData::class.java)
             if (data.chatName == null || data.text == null) {
                 throw BadRequestErrorResponse.halt(gson)
@@ -109,9 +114,30 @@ class ChatController(
             val message = Message(0, user.id, data.text, time)
 
             val chat = chatRepository.getChat(data.chatName)!!
-            //val updateChat = Chat(chat.id, chat.)
+            val updateChat = Chat(chat.id, chat.name, mutableListOf<Message>().apply {
+                addAll(chat.messages)
+                add(message)
+            })
+            chatRepository.saveChat(updateChat)
 
             BaseOkResponse()
         }, gson::toJson, tokenManager)
     }
+
+    private fun getChatResponse(chat: Chat) =
+        ChatOkResponse(
+            ChatResponse(
+                chat.id,
+                chat.name,
+                chat.messages.map { message ->
+                    val user = userRepository.getUserById(message.authorId)!!
+                    MessageResponse(
+                        message.id,
+                        UserResponse(user.id, user.login, user.name, user.photo),
+                        message.text,
+                        message.time
+                    )
+                }.reversed()
+            )
+        )
 }
