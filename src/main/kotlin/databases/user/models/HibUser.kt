@@ -1,6 +1,7 @@
 package databases.user.models
 
 import databases.base.HibEntity
+import databases.chat.models.HibChat
 import java.io.Serializable
 import javax.persistence.*
 
@@ -16,4 +17,6 @@ class HibUser: Serializable, HibEntity {
     var name: String = ""
     var photo: String = ""
     var password: String = ""
+    @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    var chats: List<HibChat> = listOf()
 }

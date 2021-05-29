@@ -30,6 +30,8 @@
 
         <!-- Annotated entity classes -->
         <mapping class="databases.user.models.HibUser"/>
+        <mapping class="databases.chat.models.HibChat"/>
+        <mapping class="databases.chat.models.HibMessage"/>
 
     </session-factory>
 </hibernate-configuration>

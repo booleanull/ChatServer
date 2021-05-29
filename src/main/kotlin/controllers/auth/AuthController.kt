@@ -39,7 +39,7 @@ class AuthController(
             val user = userRepository.getUser(authData) ?: throw AuthDataErrorResponse.halt(gson)
 
             val token = tokenManager.generateAuthToken(authData)
-            val updateUser = User(user.id, token, user.login, user.name, user.photo, user.password)
+            val updateUser = User(user.id, token, user.login, user.name, user.photo, user.password, user.chats)
             val savedUser = userRepository.saveUser(updateUser)!!
 
             AuthorisationOkResponse(savedUser.id, savedUser.login, savedUser.name, savedUser.photo, savedUser.token)
@@ -56,7 +56,7 @@ class AuthController(
             val password = String(Hex.encodeHex(DigestUtils.md5(data.password)))
             val authData = AuthData(data.login, password)
             val token = tokenManager.generateAuthToken(authData)
-            val user = User(0, token, data.login, data.name, data.photo, password)
+            val user = User(0, token, data.login, data.name, data.photo, password, listOf())
 
             val id = userRepository.createUser(user)
             if (id == -1) throw UserAlreadyExistsErrorResponse.halt(gson)

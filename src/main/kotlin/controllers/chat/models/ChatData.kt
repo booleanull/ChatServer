@@ -2,7 +2,7 @@ package controllers.chat.models
 
 import com.google.gson.annotations.SerializedName
 
-data class StartChatData(
-    @SerializedName("login")
-    val login: String
+data class ChatData(
+    @SerializedName("chatName")
+    val chatName: String
 )

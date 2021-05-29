@@ -1,6 +1,7 @@
 package repositories.user.models
 
 import com.google.gson.annotations.SerializedName
+import repositories.chat.models.Chat
 
 data class User(
     @SerializedName("id")
@@ -14,5 +15,7 @@ data class User(
     @SerializedName("photo")
     val photo: String,
     @SerializedName("password")
-    val password: String
+    val password: String,
+    @SerializedName("chats")
+    val chats: List<Chat>
 )

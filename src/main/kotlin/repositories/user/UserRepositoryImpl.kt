@@ -4,6 +4,7 @@ import controllers.auth.models.AuthData
 import databases.toHibUser
 import databases.toUser
 import databases.user.UserDao
+import repositories.chat.models.Chat
 import repositories.user.models.User
 
 class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
@@ -19,6 +20,10 @@ class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 
     override fun getUser(authData: AuthData): User? {
         return userDao.findUser(authData)?.toUser()
+    }
+
+    override fun getUserById(id: Int): User? {
+        return userDao.findUser(id)?.toUser()
     }
 
     override fun getUserByToken(token: String): User? {

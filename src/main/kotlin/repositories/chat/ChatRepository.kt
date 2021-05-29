@@ -4,5 +4,5 @@ import repositories.chat.models.Chat
 
 interface ChatRepository {
 
-    fun getChats(): List<Chat>
+    fun getChat(chatName: String): Chat?
 }

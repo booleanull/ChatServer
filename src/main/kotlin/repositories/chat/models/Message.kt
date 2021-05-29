@@ -1,11 +1,14 @@
 package repositories.chat.models
 
-import repositories.user.models.User
+import com.google.gson.annotations.SerializedName
 
 data class Message(
+    @SerializedName("id")
     val id: Int,
-    val chatId: Int,
-    val author: User,
+    @SerializedName("authorId")
+    val authorId: Int,
+    @SerializedName("text")
     val text: String,
+    @SerializedName("time")
     val time: String
 )

@@ -21,6 +21,20 @@ class UserDao(sessionFactory: SessionFactory) : BaseDao<HibUser>(sessionFactory,
         }) ?: true
     }
 
+    fun findUser(id: Int): HibUser? {
+        val result = withEntityManager({
+            it.createQuery(
+                "FROM HibUser " +
+                        "WHERE id=:id", HibUser::class.java
+            )
+                .setParameter("id", id)
+                .resultList
+                .toList()
+        }) ?: emptyList()
+
+        return result.firstOrNull()
+    }
+
     fun findUser(token: String): HibUser? {
         val result = withEntityManager({
             it.createQuery(
