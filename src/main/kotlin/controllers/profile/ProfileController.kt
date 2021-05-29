@@ -4,9 +4,9 @@ import com.google.gson.Gson
 import controllers.base.BaseController
 import controllers.base.get
 import controllers.base.post
+import controllers.base.responses.error.UserNotFoundErrorResponse
 import controllers.profile.model.EditData
 import controllers.profile.responses.ok.EditOkResponse
-import controllers.profile.responses.error.UserNotFoundErrorResponse
 import controllers.profile.responses.ok.ProfileReceivedOkResponse
 import repositories.token.TokenManager
 import repositories.user.UserRepository
@@ -17,6 +17,7 @@ class ProfileController (
     private val userRepository: UserRepository,
     private val tokenManager: TokenManager
 ) : BaseController {
+
     override fun start() {
         initGetProfile()
         initEdit()
@@ -29,7 +30,7 @@ class ProfileController (
             val user = userRepository.getUserById(id) ?: throw UserNotFoundErrorResponse.halt(gson)
 
             ProfileReceivedOkResponse(user.id, user.login, user.name, user.photo)
-        }, gson::toJson)
+        }, gson::toJson, tokenManager)
     }
 
     private fun initEdit() {
@@ -46,14 +47,15 @@ class ProfileController (
                 user.id,
                 user.token,
                 user.login,
-                updatedName?:user.name,
-                updatedPhoto?:user.photo,
+                updatedName ?: user.name,
+                updatedPhoto ?: user.photo,
                 user.password,
-                user.chats)
+                user.chats
+            )
 
             userRepository.saveUser(updatedUser)
 
-            EditOkResponse(updatedUser.id, updatedUser.login, updatedUser.name, updatedUser.photo, updatedUser.token)
+            EditOkResponse(updatedUser.id, updatedUser.login, updatedUser.name, updatedUser.photo)
         }, gson::toJson, tokenManager)
     }
 }

@@ -11,7 +11,5 @@ data class EditOkResponse(
     @SerializedName("name")
     val name: String,
     @SerializedName("photo")
-    val photo: String,
-    @SerializedName("token")
-    val token: String
+    val photo: String
 ): BaseOkResponse()
