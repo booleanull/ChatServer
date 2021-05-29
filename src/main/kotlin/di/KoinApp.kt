@@ -30,6 +30,7 @@ val appModule = module {
     single { AuthController(get(), get(), get()) }
     single { ChatController(get(), get(), get(), get()) }
     single { ProfileController(get(), get(), get()) }
+    single { SettingsController() }
 
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<TokenManager> { TokenManagerImpl(get()) }
