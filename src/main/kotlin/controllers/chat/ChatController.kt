@@ -11,6 +11,8 @@ import controllers.chat.models.EditMessageData
 import controllers.chat.models.SendData
 import controllers.chat.response.error.ChatNotFoundErrorResponse
 import controllers.chat.response.error.ChatStartErrorResponse
+import controllers.chat.response.error.NullMessageErrorResponse
+import controllers.chat.response.error.PermissionDeniedErrorResponse
 import controllers.chat.response.ok.*
 import repositories.chat.ChatRepository
 import repositories.chat.models.Chat
@@ -134,20 +136,20 @@ class ChatController(
                 throw BadRequestErrorResponse.halt(gson)
             }
 
-            val chat = chatRepository.getChat(data.chatName)!!
+            val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
 
             val token = req.headers("token")!!
             val user = userRepository.getUserByToken(token)!!
 
-            val message: Message? = chatRepository.getChat(data.chatName)!!.messages.find {
+            val message: Message = chat.messages.find {
                 it.id == data.messageId
-            }
+            } ?: throw NullMessageErrorResponse.halt(gson)
 
-            if (message == null || message.authorId != user.id)
-                BadRequestErrorResponse.halt(gson)
+            if (message.authorId != user.id)
+                throw PermissionDeniedErrorResponse.halt(gson)
 
             val updateMessage = Message(
-                message!!.id,
+                message.id,
                 message.authorId,
                 data.text,
                 message.time
@@ -159,7 +161,7 @@ class ChatController(
             })
             chatRepository.saveChat(updateChat)
 
-            BaseOkResponse()
+            getChatResponse(updateChat)
         }, gson::toJson, tokenManager)
     }
 
@@ -173,7 +175,7 @@ class ChatController(
             val token = req.headers("token")!!
             val user = userRepository.getUserByToken(token)!!
 
-            val chat = chatRepository.getChat(data.chatName)!!
+            val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
 
             val updateUser = User(
                 user.id,
@@ -190,7 +192,7 @@ class ChatController(
 
             userRepository.saveUser(updateUser)
 
-            BaseOkResponse()
+            ChatsOkResponse(updateUser.chats.map { it.name })
         }, gson::toJson, tokenManager)
     }
 
