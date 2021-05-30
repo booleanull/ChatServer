@@ -7,9 +7,12 @@ import controllers.base.post
 import controllers.base.responses.error.BadRequestErrorResponse
 import controllers.base.responses.ok.BaseOkResponse
 import controllers.chat.models.ChatData
+import controllers.chat.models.EditMessageData
 import controllers.chat.models.SendData
 import controllers.chat.response.error.ChatNotFoundErrorResponse
 import controllers.chat.response.error.ChatStartErrorResponse
+import controllers.chat.response.error.NullMessageErrorResponse
+import controllers.chat.response.error.PermissionDeniedErrorResponse
 import controllers.chat.response.ok.*
 import repositories.chat.ChatRepository
 import repositories.chat.models.Chat
@@ -32,6 +35,8 @@ class ChatController(
         initChats()
         initChat()
         initSend()
+        initEdit()
+        initLeave()
     }
 
     private fun initStartChat() {
@@ -121,6 +126,73 @@ class ChatController(
             chatRepository.saveChat(updateChat)
 
             BaseOkResponse()
+        }, gson::toJson, tokenManager)
+    }
+
+    private fun initEdit() {
+        post("/chat/edit", { req, res ->
+            val data = gson.fromJson(req.body(), EditMessageData::class.java)
+            if (data.chatName == null || data.messageId == null || data.text == null) {
+                throw BadRequestErrorResponse.halt(gson)
+            }
+
+            val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
+
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            val message: Message = chat.messages.find {
+                it.id == data.messageId
+            } ?: throw NullMessageErrorResponse.halt(gson)
+
+            if (message.authorId != user.id)
+                throw PermissionDeniedErrorResponse.halt(gson)
+
+            val updateMessage = Message(
+                message.id,
+                message.authorId,
+                data.text,
+                message.time
+            )
+
+            val updateChat = Chat(chat.id, chat.name, mutableListOf<Message>().apply {
+                addAll(chat.messages)
+                set(indexOf(message), updateMessage)
+            })
+            chatRepository.saveChat(updateChat)
+
+            getChatResponse(updateChat)
+        }, gson::toJson, tokenManager)
+    }
+
+    private fun initLeave() {
+        post("/chat/leave", { req, res ->
+            val data = gson.fromJson(req.body(), ChatData::class.java)
+            if (data.chatName == null) {
+                throw BadRequestErrorResponse.halt(gson)
+            }
+
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
+
+            val updateUser = User(
+                user.id,
+                user.token,
+                user.login,
+                user.name,
+                user.photo,
+                user.password,
+                mutableListOf<Chat>().apply {
+                    addAll(user.chats)
+                    remove(chat)
+                }
+            )
+
+            userRepository.saveUser(updateUser)
+
+            ChatsOkResponse(updateUser.chats.map { it.name })
         }, gson::toJson, tokenManager)
     }
 
