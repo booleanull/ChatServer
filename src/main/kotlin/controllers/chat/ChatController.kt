@@ -7,6 +7,7 @@ import controllers.base.post
 import controllers.base.responses.error.BadRequestErrorResponse
 import controllers.base.responses.ok.BaseOkResponse
 import controllers.chat.models.ChatData
+import controllers.chat.models.EditMessageData
 import controllers.chat.models.SendData
 import controllers.chat.response.error.ChatNotFoundErrorResponse
 import controllers.chat.response.error.ChatStartErrorResponse
@@ -32,6 +33,8 @@ class ChatController(
         initChats()
         initChat()
         initSend()
+        initEdit()
+        initLeave()
     }
 
     private fun initStartChat() {
@@ -119,6 +122,73 @@ class ChatController(
                 add(message)
             })
             chatRepository.saveChat(updateChat)
+
+            BaseOkResponse()
+        }, gson::toJson, tokenManager)
+    }
+
+    private fun initEdit() {
+        post("/chat/edit", { req, res ->
+            val data = gson.fromJson(req.body(), EditMessageData::class.java)
+            if (data.chatName == null || data.messageId == null || data.text == null) {
+                throw BadRequestErrorResponse.halt(gson)
+            }
+
+            val chat = chatRepository.getChat(data.chatName)!!
+
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            val message: Message? = chatRepository.getChat(data.chatName)!!.messages.find {
+                it.id == data.messageId
+            }
+
+            if (message == null || message.authorId != user.id)
+                BadRequestErrorResponse.halt(gson)
+
+            val updateMessage = Message(
+                message!!.id,
+                message.authorId,
+                data.text,
+                message.time
+            )
+
+            val updateChat = Chat(chat.id, chat.name, mutableListOf<Message>().apply {
+                addAll(chat.messages)
+                set(indexOf(message), updateMessage)
+            })
+            chatRepository.saveChat(updateChat)
+
+            BaseOkResponse()
+        }, gson::toJson, tokenManager)
+    }
+
+    private fun initLeave() {
+        post("/chat/leave", { req, res ->
+            val data = gson.fromJson(req.body(), ChatData::class.java)
+            if (data.chatName == null) {
+                throw BadRequestErrorResponse.halt(gson)
+            }
+
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            val chat = chatRepository.getChat(data.chatName)!!
+
+            val updateUser = User(
+                user.id,
+                user.token,
+                user.login,
+                user.name,
+                user.photo,
+                user.password,
+                mutableListOf<Chat>().apply {
+                    addAll(user.chats)
+                    remove(chat)
+                }
+            )
+
+            userRepository.saveUser(updateUser)
 
             BaseOkResponse()
         }, gson::toJson, tokenManager)
