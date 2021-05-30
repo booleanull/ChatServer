@@ -13,7 +13,7 @@ class TokenManagerImpl(
         get() = System.currentTimeMillis()
 
     override fun generateAuthToken(authData: AuthData): String = Jwts.builder()
-        .claim("email", authData.login)
+        .claim("login", authData.login)
         .claim("password", authData.password)
         .claim("currentTime", currentTime)
         .signWith(SignatureAlgorithm.HS512, Constants.JWT_SECRET).compact()
