@@ -209,7 +209,7 @@ class ChatController(
                         message.text,
                         message.time
                     )
-                }.reversed()
+                }
             )
         )
 }

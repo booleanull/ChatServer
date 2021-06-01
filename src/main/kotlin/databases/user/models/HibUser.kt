@@ -19,5 +19,6 @@ class HibUser: Serializable, HibEntity {
     var photo: String = ""
     var password: String = ""
     @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OrderBy("id")
     var chats: List<HibChat> = listOf()
 }

@@ -13,5 +13,6 @@ class HibChat: Serializable, HibEntity {
     var id: Int = 0
     var name: String = ""
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OrderBy("id")
     var message: List<HibMessage> = listOf()
 }

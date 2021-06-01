@@ -11,7 +11,7 @@ class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 
     override fun createUser(user: User): Int {
         val hibUser = user.toHibUser()
-        if(userDao.userWithDataExists(hibUser)) {
+        if (userDao.userWithDataExists(hibUser)) {
             return -1
         }
 
