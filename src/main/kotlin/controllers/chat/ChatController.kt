@@ -114,7 +114,7 @@ class ChatController(
 
             val token = req.headers("token")!!
             val user = userRepository.getUserByToken(token)!!
-            val simpleDateFormat = SimpleDateFormat("hh:mm dd/MM/yyyy")
+            val simpleDateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
             val time = simpleDateFormat.format(Date(System.currentTimeMillis()))
             val message = Message(0, user.id, data.text, time)
 
