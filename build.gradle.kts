@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.32"
-    distribution
 }
 
 group = "com.booleanull"
@@ -18,7 +17,7 @@ dependencies {
     implementation("io.insert-koin:koin-core:2.2.3")
     implementation("commons-codec:commons-codec:1.9")
     implementation("org.hibernate:hibernate-core:5.2.10.Final")
-    implementation("org.postgresql:postgresql:42.2.20")
+    implementation("org.postgresql:postgresql:42.2.2.jre7")
     implementation("io.jsonwebtoken:jjwt:0.5.1")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.2")
