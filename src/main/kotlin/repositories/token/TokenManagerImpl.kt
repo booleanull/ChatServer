@@ -25,7 +25,7 @@ class TokenManagerImpl(
                 .parseClaimsJws(token)
                 .body
 
-            val email = (tokenBody["email"] as? String) ?: return false
+            val email = (tokenBody["login"] as? String) ?: return false
             val password = (tokenBody["password"] as? String) ?: return false
 
             val user = userRepository.getUser(AuthData(email, password)) ?: return false
