@@ -35,6 +35,4 @@ data class UserResponse(
     val login: String,
     @SerializedName("name")
     val name: String,
-    @SerializedName("photo")
-    val photo: String
 )
