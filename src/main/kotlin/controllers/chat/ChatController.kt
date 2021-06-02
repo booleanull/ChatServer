@@ -205,7 +205,7 @@ class ChatController(
                     val user = userRepository.getUserById(message.authorId)!!
                     MessageResponse(
                         message.id,
-                        UserResponse(user.id, user.login, user.name, user.photo),
+                        UserResponse(user.id, user.login, user.name),
                         message.text,
                         message.time
                     )
