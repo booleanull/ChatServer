@@ -34,7 +34,5 @@ data class UserResponse(
     @SerializedName("login")
     val login: String,
     @SerializedName("name")
-    val name: String,
-    @SerializedName("photo")
-    val photo: String
+    val name: String
 )
