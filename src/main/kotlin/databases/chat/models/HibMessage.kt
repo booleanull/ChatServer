@@ -12,6 +12,7 @@ class HibMessage: Serializable, HibEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int = 0
     var authorId: Int = 0
+    @Column(columnDefinition = "text")
     var text: String = ""
     var time: String = ""
 }
