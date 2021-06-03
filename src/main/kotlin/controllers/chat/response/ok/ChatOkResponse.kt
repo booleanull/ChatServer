@@ -34,5 +34,5 @@ data class UserResponse(
     @SerializedName("login")
     val login: String,
     @SerializedName("name")
-    val name: String,
+    val name: String
 )
