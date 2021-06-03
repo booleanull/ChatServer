@@ -125,7 +125,13 @@ class ChatController(
             })
             chatRepository.saveChat(updateChat)
 
-            BaseOkResponse()
+            val addedMessage = chatRepository.getChat(updateChat.name)!!.messages.last()
+            MessageResponse(
+                addedMessage.id,
+                UserResponse(user.id, user.login, user.name),
+                addedMessage.text,
+                addedMessage.time
+            )
         }, gson::toJson, tokenManager)
     }
 

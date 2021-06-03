@@ -26,7 +26,7 @@ data class MessageResponse(
     val text: String,
     @SerializedName("time")
     val time: String
-)
+) : BaseOkResponse()
 
 data class UserResponse(
     @SerializedName("id")
