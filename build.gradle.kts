@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.booleanull"
-version = "3.0"
+version = "5.0"
 
 repositories {
     mavenCentral()

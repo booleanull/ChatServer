@@ -33,6 +33,6 @@ val appModule = module {
     single { SettingsController() }
 
     single<UserRepository> { UserRepositoryImpl(get()) }
-    single<TokenManager> { TokenManagerImpl(get()) }
     single<ChatRepository> { ChatRepositoryImpl(get()) }
+    single<TokenManager> { TokenManagerImpl(get()) }
 }

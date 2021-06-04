@@ -8,6 +8,7 @@ import controllers.base.responses.error.BadRequestErrorResponse
 import controllers.base.responses.ok.BaseOkResponse
 import controllers.chat.models.ChatData
 import controllers.chat.models.EditMessageData
+import controllers.chat.models.RemoveMessageData
 import controllers.chat.models.SendData
 import controllers.chat.response.error.ChatNotFoundErrorResponse
 import controllers.chat.response.error.ChatStartErrorResponse
@@ -36,6 +37,7 @@ class ChatController(
         initChat()
         initSend()
         initEdit()
+        initRemove()
         initLeave()
     }
 
@@ -171,6 +173,35 @@ class ChatController(
         }, gson::toJson, tokenManager)
     }
 
+    private fun initRemove() {
+        post("/chat/remove", { req, res ->
+            val data = gson.fromJson(req.body(), RemoveMessageData::class.java)
+            if (data.chatName == null || data.messageId == null) {
+                throw BadRequestErrorResponse.halt(gson)
+            }
+
+            val chat = chatRepository.getChat(data.chatName) ?: throw ChatNotFoundErrorResponse.halt(gson)
+
+            val token = req.headers("token")!!
+            val user = userRepository.getUserByToken(token)!!
+
+            val message: Message = chat.messages.find {
+                it.id == data.messageId
+            } ?: throw NullMessageErrorResponse.halt(gson)
+
+            if (message.authorId != user.id)
+                throw PermissionDeniedErrorResponse.halt(gson)
+
+            val updateChat = Chat(chat.id, chat.name, mutableListOf<Message>().apply {
+                addAll(chat.messages)
+                removeIf { it.id == message.id }
+            })
+            chatRepository.saveChat(updateChat)
+
+            BaseOkResponse()
+        }, gson::toJson, tokenManager)
+    }
+
     private fun initLeave() {
         post("/chat/leave", { req, res ->
             val data = gson.fromJson(req.body(), ChatData::class.java)
@@ -222,8 +253,7 @@ class ChatController(
                     UserResponse(
                         user.id,
                         user.login,
-                        user.name,
-                        user.photo
+                        user.name
                     )
                 }
             )
