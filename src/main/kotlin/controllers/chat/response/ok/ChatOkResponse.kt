@@ -2,6 +2,7 @@ package controllers.chat.response.ok
 
 import com.google.gson.annotations.SerializedName
 import controllers.base.responses.ok.BaseOkResponse
+import repositories.user.models.User
 
 data class ChatOkResponse(
     @SerializedName("chat")
@@ -14,7 +15,9 @@ data class ChatResponse(
     @SerializedName("name")
     val name: String,
     @SerializedName("message")
-    val message: List<MessageResponse>
+    val message: List<MessageResponse>,
+    @SerializedName("users")
+    val users: List<UserResponse>
 )
 
 data class MessageResponse(
@@ -38,3 +41,8 @@ data class UserResponse(
     @SerializedName("photo")
     val photo: String
 )
+
+data class UsersInChatResponse(
+    @SerializedName("users")
+    val id: List<UserResponse>
+) : BaseOkResponse()

@@ -77,4 +77,12 @@ class UserDao(sessionFactory: SessionFactory) : BaseDao<HibUser>(sessionFactory,
 
         return result.firstOrNull()
     }
+
+    fun findAllUsers(): List<HibUser> = withEntityManager({
+        it.createQuery(
+            "FROM HibUser", HibUser::class.java
+        )
+            .resultList
+            .toList()
+    }) ?: emptyList()
 }

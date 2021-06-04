@@ -196,8 +196,10 @@ class ChatController(
         }, gson::toJson, tokenManager)
     }
 
-    private fun getChatResponse(chat: Chat) =
-        ChatOkResponse(
+    private fun getChatResponse(chat: Chat): ChatOkResponse {
+        val users = userRepository.getAllUsers().filter { it.chats.contains(chat) }
+
+        return ChatOkResponse(
             ChatResponse(
                 chat.id,
                 chat.name,
@@ -209,7 +211,16 @@ class ChatController(
                         message.text,
                         message.time
                     )
+                },
+                users.map { user ->
+                    UserResponse(
+                        user.id,
+                        user.login,
+                        user.name,
+                        user.photo
+                    )
                 }
             )
         )
+    }
 }
