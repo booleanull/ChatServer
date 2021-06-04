@@ -7,7 +7,7 @@ import databases.user.UserDao
 import repositories.chat.models.Chat
 import repositories.user.models.User
 
-class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
+class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
 
     override fun createUser(user: User): Int {
         val hibUser = user.toHibUser()
@@ -32,6 +32,10 @@ class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 
     override fun getUserByLogin(login: String): User? {
         return userDao.findUserByLogin(login)?.toUser()
+    }
+
+    override fun getAllUsers(): List<User> {
+        return userDao.findAllUsers().map { it.toUser() }
     }
 
     override fun saveUser(user: User): User? {

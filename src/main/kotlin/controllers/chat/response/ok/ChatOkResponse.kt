@@ -14,7 +14,9 @@ data class ChatResponse(
     @SerializedName("name")
     val name: String,
     @SerializedName("message")
-    val message: List<MessageResponse>
+    val message: List<MessageResponse>,
+    @SerializedName("users")
+    val users: List<UserResponse>
 )
 
 data class MessageResponse(

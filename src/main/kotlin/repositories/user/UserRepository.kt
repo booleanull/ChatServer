@@ -16,6 +16,8 @@ interface UserRepository {
 
     fun getUserByLogin(login: String): User?
 
+    fun getAllUsers(): List<User>
+
     fun saveUser(user: User): User?
 
     fun removeUser(user: User)
